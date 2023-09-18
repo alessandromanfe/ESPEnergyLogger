@@ -4,8 +4,6 @@ import random
 from datetime import datetime
 import time
 
-conn = sqlite3.connect("energyLogs.db")
-
 QUEUE_TIME = 60
 
 typeList = ["energy","voltage","current"]
@@ -35,7 +33,7 @@ def processLogData(args):
     if args["timestamp"] - logQueue[0]["timestamp"] > QUEUE_TIME:
         values = [tuple(d.values()) for d in logQueue]
         print(values)
-        conn = sqlite3.connect("energyLogs.db")
+        conn = sqlite3.connect("../data/energyLogs.db")
         with conn:
             cur = conn.cursor()
             cur.executemany('''INSERT INTO energy_logs (timestamp,energy,voltage,current)
@@ -82,7 +80,7 @@ def getLogData(args):
         return {"status":"ok", "types":types, "values":values}
     
     
-    conn = sqlite3.connect("energyLogs.db")
+    conn = sqlite3.connect("../data/energyLogs.db")
     with conn:
         cur = conn.cursor()
         divider = None
@@ -147,7 +145,7 @@ def getInitializeData(args):
         if len(logQueue) != 0:
             lv = logQueue[-1]["energy"]
         else:
-            conn = sqlite3.connect("energyLogs.db")
+            conn = sqlite3.connect("../data/energyLogs.db")
             with conn:
                 cur = conn.cursor()
                 cur.execute('''SELECT timestamp,energy
@@ -164,7 +162,7 @@ def getInitializeData(args):
     
 
     
-    conn = sqlite3.connect("energyLogs.db")
+    conn = sqlite3.connect("../data/energyLogs.db")
     with conn:
         cur = conn.cursor()
         cur.execute('''SELECT timestamp,energy
