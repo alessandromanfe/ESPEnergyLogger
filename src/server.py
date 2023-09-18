@@ -11,7 +11,7 @@ def page():
     return send_from_directory('static', "page.html")
 
 @app.route('/energy')
-def page():
+def servePage():
     return send_from_directory('static', "page.html")
 
 @app.route('/energy/send_data')
