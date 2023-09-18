@@ -1,0 +1,81 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="static/style.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+        <script src="https://cdn.anychart.com/releases/8.11.1/js/anychart-core.min.js"></script>
+        <script src="https://cdn.anychart.com/releases/8.11.1/js/anychart-heatmap.min.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="static/main.js"></script>
+    </head>    
+    <body>
+        <div id="main_title">
+            <h1>Riepilogo Consumi</h1>
+            <div>
+                <div id="status_div">
+                    <div id="circle_light"></div>
+                    <p id="status_text">Logger offline</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="gauge_chart" style="height: 220px;">
+                <div id="gauge_1" class="gauge"></div>
+                <div id="gauge_2" class="gauge"></div>
+                <div id="gauge_3" class="gauge"></div>
+        </div>
+        <div id="info_div">
+            <div id="info_1" class="info">
+                <p class="info_title">Consumo Giornaliero</p>
+                <p id="day" class="info_value">12345678 Wh</p>
+            </div>    
+            <div id="info_2" class="info">
+                <p class="info_title">Consumo Mensile</p>
+                <p id="month" class="info_value">12345678 Wh</p>
+            </div>
+            <div id="info_3" class="info">
+                <p class="info_title">Consumo Totale</p>
+                <p id="tot" class="info_value">12345678 Wh</p>
+            </div>
+        </div>
+        <div id="rt_line_chart_div">
+            <div id="rt_line_chart" style="width: 80%; height: 500px;"></div>
+            <div id="rt_line_chart_legend"></div>
+        </div>
+        <div id="map_chart1" style="max-width: 1100px; height: 375px;"></div>
+        <div>
+            <h1 id="search_title">Ricerca storico</h1>
+        </div>
+        <div id="input_div">
+            <div class="input_block">
+                <p id="p1">Da:</p>
+                <p id="p2">A:</p>
+            </div>
+            <div class="input_block">
+                <div><input class="date_input" type="date" id="date-from" name="date-from"/></div>
+                <div><input class="date_input" type="date" id="date-to" name="date-to"/></div>
+            </div>
+            <div class="input_block">
+                <div><input class="time_input" type="time" id="time-from" name="time-from"/></div>
+                <div><input class="time_input" type="time" id="time-to" name="time-to"/></div>
+            </div>
+            <button id="sendQueryBtn">Cerca</button>
+        </div>
+        <p id="text"></p>
+        <!--<div id="curve_chart_div">
+            <div id="curve_chart1" style="width: 1200px; height: 500px;"></div> 
+            <div id="curve_chart1_legend"></div>
+        </div>
+        
+        <div id="map_chart1" style="width: 1200px; height: 500px;"></div>
+        <div id="gauge_chart" style="width: 400px; height: 120px;"></div> -->
+        <div id="curve_chart_div">
+            <div id="curve_chart1" style="width: 80%; height: 500px;"></div> 
+            <div id="curve_chart1_legend"></div>
+        </div>
+        
+        
+    </body>
+    <footer>
+        <div>alessandro.manfe98@gmail.com</div>
+    </footer>
+</html>

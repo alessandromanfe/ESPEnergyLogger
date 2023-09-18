@@ -1,0 +1,268 @@
+* {
+    margin: 0;
+    padding: 0;
+} 
+
+body{
+    background-color: #f3f2ee;
+}
+
+#main_title{
+    display: flex;
+    margin-left: 2%;
+    font-family: Arial, Helvetica, sans-serif;
+    color:#444;
+}
+
+#main_title h1{
+    padding: 30px;
+    font-size: 50px;
+}
+
+#main_title div{
+    font-size: 20px;
+    justify-content: right;
+    align-content: right;
+    flex-grow: 1;
+    position:relative;
+}
+
+
+
+#status_div{
+    display:flex;
+    text-align: right;
+    vertical-align: middle;
+    width:160px;
+    margin-left:auto;
+    margin-right:50px;
+    margin-top:50px;
+}
+
+#status_text{
+    margin-left: 5px;
+    flex-grow: 1;
+}
+
+#circle_light{
+    margin-top:4px;
+    min-height:15px;
+    max-height:15px;
+    min-width: 15px;
+    max-width: 15px;
+    background-color: red;
+    border-radius: 50%;
+    border: 1px solid #ffffff;
+    box-shadow: 0px 0px 5px 2px #ff0000;
+
+}
+
+#search_title{
+    border-top: 5px solid #444;
+    padding: 30px;
+    padding-left: 2%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 30px;
+    color:#444;
+}
+
+#info_div{
+    margin-top: 50px;
+    margin-bottom: 120px;
+    position: relative;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px; 
+    color:#444;
+    text-align: center;
+}
+
+.info{
+    width: 250px;
+    padding: 20px;
+    border-right: 5px solid #444; 
+    border-bottom: 5px solid #444;
+    border-top: 1px solid #f3f2ee;
+    border-left: 1px solid #f3f2ee;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.info_title{
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+#info_2{
+    margin-left: 5%;
+    margin-right: 5%
+}
+
+
+#rt_line_chart_div{
+    margin-top: 20px;
+}
+
+#curve_chart_div, #rt_line_chart_div{
+    display: flex;
+}
+
+#curve_chart1, #rt_line_chart{
+    padding-left: 2%;
+}
+
+#map_chart1{
+    padding-left: 2%;
+    max-width: 1100px;
+    margin-right: 5%;
+    margin-bottom: 50px;
+}
+
+ul{
+    list-style-type: none;
+}
+
+#input_div{
+    padding-left:3%;
+    display:flex;
+    margin-bottom: 50px;
+}
+
+.input_block{
+    display:block;
+    padding-right: 2%;
+}
+
+.input_block p{
+    font-size: 18;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: right;
+}
+
+.input_block #p1{
+    margin-bottom: 15px;
+}
+
+.date_input{
+    font-size: 18px;
+}
+
+.time_input{
+    font-size: 17px;
+}
+
+.date_input, .time_input{
+    margin-bottom: 5px;
+}
+
+#sendQueryBtn{
+    background-color: white;
+    font-family: sans-serif, Arial;
+    font-size: 18px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    box-sizing: border-box;
+    width: 100px;
+    height: 50px;
+    margin-top: 5px;
+}
+
+#curve_chart1_legend_list, #rt_line_chart_legend_list{
+    position: relative;
+    top: 50%;
+    border: black;
+    border-radius: 3px;
+}
+
+#curve_chart1_legend_list input[type="radio"], #rt_line_chart_legend_list input[type="radio"]{
+    opacity: 0;
+    position: fixed;
+    width: 0;
+}
+
+.radio_label{
+    padding-left: 10px;
+}
+
+.curve_chart1_legend_div, .rt_line_chart_legend_div{
+    display:flex;
+    background-color: #ffffff;
+    margin: 5px;
+    width: 100%;
+    padding: 8px 16px;
+    font-family: sans-serif, Arial;
+    font-size: 16px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    box-sizing: border-box;
+    opacity: 0.5;
+}
+
+.curve_chart1_legend_div:hover, .rt_line_chart_legend_div:hover{
+    background-color: #ddd;
+}
+
+#curve_chart_div{
+    margin-bottom: 75px;
+}
+
+.circle{
+    margin-top: 2px;
+    height: 12px;
+    width: 12px;
+    border-radius: 2px;
+    /*border: 1px solid #444;*/
+}
+
+
+/*.radio_label{
+    font-family: Arial, Helvetica, sans-serif;
+    display: grid;
+    grid-template-columns: 8em auto;
+    gap: -10em;
+
+}*/
+
+#gauge_chart {
+    border-top: 5px solid #444;
+    border-bottom: 5px solid #444;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color: #cecece;
+    position: relative;
+
+}
+
+.gauge {
+    top: 8px;
+    padding: 15px 15px 15px 15px; 
+    border-radius: 100px;
+    min-height: inherit;
+    background-color: #8b8b7c;
+    box-shadow: 5px 5px 10px 3px #444, 3px 3px 5px 1px rgba(255, 255, 255, 0.219) inset;
+}
+
+#gauge_2{
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+footer{
+    height: 100px;
+    background-color: #444;
+    font-family: sans-serif, Arial;
+    position: relative;
+}
+
+footer div {
+    position: absolute;
+    top: 50px;
+    color:#cecece;
+    padding:10px;
+    right: 20;
+}
+
