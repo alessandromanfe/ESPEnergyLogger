@@ -1,13 +1,16 @@
 
-chart1Data = [];
-gaugeChart = null;
+//global vars :(
+//let chart1Data = [];
+//let gaugeChart = null;
 let rtb = null;
-colors = ['#4ac43d','#bd0808','#ff8030','#2b7df0']
-colordict = {"energy":'#4ac43d',"voltage":'#bd0808',"current":'#ff8030',"power":'#2b7df0'};
-nameDict = {"energy":'Energy [Wh]',"voltage":'Voltage [V]',"current":'Current [A]',"power":'Power [W]'};
-days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const colors = ['#4ac43d','#bd0808','#ff8030','#2b7df0']
+const colordict = {"energy":'#4ac43d',"voltage":'#bd0808',"current":'#ff8030',"power":'#2b7df0'};
+const nameDict = {"energy":'Energy [Wh]',"voltage":'Voltage [V]',"current":'Current [A]',"power":'Power [W]'};
+const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
-unitDict = {}
+//unitDict = {}
+
+//Helper function to slice array
 Array.prototype.sliceStep = function(b,e,s) {
   var n=[];
   for (var i=b; i<e; i+=s) {
@@ -16,6 +19,7 @@ Array.prototype.sliceStep = function(b,e,s) {
   return n;
 }
 
+//Broker for real time data update
 class RealTimeBroker {
   constructor(){
     this.data = Array(120).fill().map(() => [Math.floor((new Date()).getTime()/1000),0,0,0]);
@@ -78,9 +82,8 @@ class RealTimeBroker {
   }
 }
 
-
+//Update selected chart tab when window get resized
 window.addEventListener('resize', () => {
-  let div = document.createElement('div');
   let divList = document.getElementsByClassName('curve_chart1_legend_div');
   for(let v of divList){
     if(v.childNodes[1].childNodes[1].checked == true){
@@ -97,6 +100,7 @@ window.addEventListener('resize', () => {
   }
 });
 
+//Initialization
 window.addEventListener('DOMContentLoaded', () => {
   /*
   var button1 = document.getElementById("btn1");
@@ -140,11 +144,37 @@ window.addEventListener('DOMContentLoaded', () => {
   loadCharts(fromTsHeatMap,toTsHeatMap);
 });
 
+
+//Set callbacks
 google.charts.load('50', {packages:['line','corechart','treemap','gauge']});
 google.charts.setOnLoadCallback(loadGoogleCharts);
 
+function loadCharts(fromTS,toTS){
+  drawHeatMap1(fromTS,toTS);
+}
 
+function loadGoogleCharts(){
+  console.log("loading complete");
+  getQueryData();
+  rtb = new RealTimeBroker();
+  let gaugeCallback = drawGaugeCharts();
+  let rtCallback = drawRtLine1(rtb.data);
+  let infoCallback = drawInfo();
+  rtb.setCallback(gaugeCallback,rtCallback,infoCallback);
+  rtb.start();
+}
+
+//Get historic data by date-time form
 function getQueryData(){
+
+  var overlay = document.getElementById("load_overlay");
+  overlay.style.display = "flex"
+  let f = function(){
+    alert("Unable to retrieve query data")
+    overlay.style.display = "none"
+  }
+  let queryTimer = setTimeout(f,10000);
+
   var fromDate = document.getElementById("date-from");
   var toDate = document.getElementById("date-to");
   var fromTime = document.getElementById("time-from");
@@ -164,71 +194,67 @@ function getQueryData(){
       console.log(status);
       console.log(data);
       drawLineChart1(data.values,data.types)
+      clearTimeout(queryTimer);
+      overlay.style.display = "none"
     });
   }
   else{
     alert("Invalid date inputs.");
+    clearTimeout(queryTimer);
+    overlay.style.display = "none"
     return;
   }
   
 }
-function loadCharts(fromTS,toTS){
-  drawHeatMap1(fromTS,toTS);
-}
 
-function loadGoogleCharts(){
-  console.log("loading complete");
-  getQueryData();
-  rtb = new RealTimeBroker();
-  let gaugeCallback = drawGaugeCharts();
-  let rtCallback = drawRtLine1(rtb.data);
-  let infoCallback = drawInfo();
-  rtb.setCallback(gaugeCallback,rtCallback,infoCallback);
-  rtb.start();
-}
-
+//Initialize status and info 
+//return update callback
 function drawInfo(){
   let dict = {};
   let tzoffset = -(new Date()).getTimezoneOffset()*60;
   $.get(`/energy/initialize?offset=${tzoffset}`, 
     function(data,status){
-      if(status == "success"){
-        if(data["status"] == "ok"){
-          let deviceStatus = data["device_status"];
-          let c = document.getElementById("circle_light")
-          if(deviceStatus == "offline"){
-            document.getElementById("status_text").innerHTML = "Logger offline"
-            c.style.backgroundColor = "red";
-            c.style.boxShadow = "0px 0px 5px 2px #ff0000";
-          }
-          else if(deviceStatus == "online"){
-            document.getElementById("status_text").innerHTML = "Logger online"
-            c.style.backgroundColor = "#00ff00";
-            c.style.boxShadow = "0px 0px 5px 2px #00ff00";
-          }
-          let value = data["value"];
-          for(let v of Object.keys(value)){
-            elem = document.getElementById(v);
-            elem.innerHTML = value[v];
-            dict[v] = [elem, value[v]];
-          }
-        }   
+
+      if(status != "success" || data["status"] != "ok") return;
+        
+      let deviceStatus = data["device_status"];
+      let c = document.getElementById("circle_light")
+      if(deviceStatus == "offline"){
+        document.getElementById("status_text").innerHTML = "Logger offline"
+        c.style.backgroundColor = "red";
+        c.style.boxShadow = "0px 0px 5px 2px #ff0000";
       }
+      else if(deviceStatus == "online"){
+        document.getElementById("status_text").innerHTML = "Logger online"
+        c.style.backgroundColor = "#00ff00";
+        c.style.boxShadow = "0px 0px 5px 2px #00ff00";
+      }
+      let value = data["value"];
+      for(let v of Object.keys(value)){
+        elem = document.getElementById(v);
+        elem.innerHTML = Math.round(value[v]) + ' Wh';
+        dict[v] = [elem, value[v]];
+      }  
     }
   );
 
   function updateInfo(rtdata){
     let tot = rtdata[1];
+    if(tot <= 0) return;
     for(let d of Object.keys(dict)){
       let val = tot - dict[d][1]
       if(d == "tot") val = tot;
-      dict[d][0].innerHTML = val + ' Wh';
+      dict[d][0].innerHTML = Math.round(val) + ' Wh';
     }
   }
 
   return updateInfo;
 }
 
+
+//Display historic data chart
+//Create buttons to switch value tab visualization
+//return update callback
 function drawLineChart1(data = [], types = []) {
     document.getElementById('curve_chart1_legend').innerHTML = '';
     if(types.length == 0) return;
@@ -266,9 +292,6 @@ function drawLineChart1(data = [], types = []) {
     if(cc_index != -1) fm_cc.format(dataTable,cc_index);
     if(pw_index != -1) fm_pw.format(dataTable,pw_index);
     var gdata = new google.visualization.DataView(dataTable);
-
-    
-    
 
     var options = {
       colors: colors,
@@ -355,7 +378,9 @@ function drawLineChart1(data = [], types = []) {
 
 }
 
-
+//Display real time data chart
+//Create buttons to switch value tab visualization
+//return update callback
 function drawRtLine1(data) {
   document.getElementById('rt_line_chart_legend').innerHTML = '';
   let currentDiv = null;
@@ -466,69 +491,70 @@ function drawRtLine1(data) {
 }
 
 
-
+//Display heatmap of monthly consumption stat
 function drawHeatMap1(fromTS, toTS){
 
-  if(typeof fromTS == "number" && typeof toTS == "number"){
-    let tzoffset = -(new Date()).getTimezoneOffset()*60;
-    $.get(`/energy/get_data?from_ts=${Math.floor(fromTS/1000)}&to_ts=${Math.floor(toTS/1000)}&types=energy&mode=hour&offset=${tzoffset}`, 
-    function(data,status){
-      if(status == "success"){
-        if(data["status"] == "ok"){
-           let ts_index = data["types"].findIndex((x) => {return x=="timestamp"});
-           let en_index = data["types"].findIndex((x) => {return x=="energy"});
-           let values = Array(7).fill().map(()=>Array(24).fill().map(() => []));
-           let count = Array(7).fill().map(()=>Array(24).fill(0));
-           data["values"].forEach((x,index) => {
-            if(index>=data["values"].length-1) return;
-              let d = new Date(x[ts_index]*1000);
-              let v = data["values"][index+1][en_index]-x[en_index];
-              values[d.getDay()][d.getHours()].push(v);
-              count[d.getDay()][d.getHours()] += 1;
-           });
-            /*.map((x) => {
-              let d = new Date(x[ts_index]);
-              return {"day":d.getDay(), "hour":d.getHours(), "energy":x[en_index]}})
-            .reduce((dict,x) => {
-              if(!(x["day"] in dict)) dict[x["day"]] = {};
-              if(!(x["hour"] in dict[x["day"]])) dict[x["day"]][x["hour"]] = [];
-              dict[x["day"]][x["hour"]].push(x["energy"]);
-            },{})*/
-           let graphData = []
-           for(let x=0; x<24; x++){
-            for(let y=1; y<8; y++){
-              let heat = 0;
-              let count = 0;
-              for(let k=0; k<values[y%7][x].length; k++){
-                heat += values[y%7][x][k];
-                count += 1;
-              }
-              if(count != 0) heat /= count;
-              graphData.push({x:x, y:days[(y%7)], heat:heat});
-            }
-           }
-           chart = anychart.heatMap(graphData);
-           let title = chart.title();
-           title.enabled(true);
-           title.align("left");
-           title.text("HeatMap consumo ultimo mese");
-           let customColorScale = anychart.scales.linearColor();
-           customColorScale.colors([colors[0], '#ffd60a', colors[1]]);
-           chart.colorScale(customColorScale);
-           let tooltip = chart.tooltip();
-           tooltip.titleFormat("{%y} {%x}:00");
-           chart.container("map_chart1");
-           chart.background().fill('#f2f3ee');
-           chart.draw();
-        }
-      }
-    });
-  }
-  else{
+  if(typeof fromTS != "number" || typeof toTS != "number"){
     alert("Invalid date inputs.");
+    return;
   }
+
+  let tzoffset = -(new Date()).getTimezoneOffset()*60;
+  $.get(`/energy/get_data?from_ts=${Math.floor(fromTS/1000)}&to_ts=${Math.floor(toTS/1000)}&types=energy&mode=hour&offset=${tzoffset}`, 
+    function(data,status){
+      
+      if(status != "success" || data["status"] != "ok") return;
+
+      let ts_index = data["types"].findIndex((x) => {return x=="timestamp"});
+      let en_index = data["types"].findIndex((x) => {return x=="energy"});
+      let values = Array(7).fill().map(()=>Array(24).fill().map(() => []));
+      let count = Array(7).fill().map(()=>Array(24).fill(0));
+      data["values"].forEach((x,index) => {
+      if(index>=data["values"].length-1) return;
+        let d = new Date(x[ts_index]*1000);
+        let v = data["values"][index+1][en_index]-x[en_index];
+        values[d.getDay()][d.getHours()].push(v);
+        count[d.getDay()][d.getHours()] += 1;
+      });
+      /*.map((x) => {
+        let d = new Date(x[ts_index]);
+        return {"day":d.getDay(), "hour":d.getHours(), "energy":x[en_index]}})
+      .reduce((dict,x) => {
+        if(!(x["day"] in dict)) dict[x["day"]] = {};
+        if(!(x["hour"] in dict[x["day"]])) dict[x["day"]][x["hour"]] = [];
+        dict[x["day"]][x["hour"]].push(x["energy"]);
+      },{})*/
+      let graphData = []
+      for(let x=0; x<24; x++){
+      for(let y=1; y<8; y++){
+        let heat = 0;
+        let count = 0;
+        for(let k=0; k<values[y%7][x].length; k++){
+          heat += values[y%7][x][k];
+          count += 1;
+        }
+        if(count != 0) heat /= count;
+        graphData.push({x:x, y:days[(y%7)], heat:heat});
+      }
+      }
+      chart = anychart.heatMap(graphData);
+      let title = chart.title();
+      title.enabled(true);
+      title.align("left");
+      title.text("HeatMap consumo ultimo mese");
+      let customColorScale = anychart.scales.linearColor();
+      customColorScale.colors([colors[0], '#ffd60a', colors[1]]);
+      chart.colorScale(customColorScale);
+      let tooltip = chart.tooltip();
+      tooltip.titleFormat("{%y} {%x}:00");
+      chart.container("map_chart1");
+      chart.background().fill('#f2f3ee');
+      chart.draw();
+  });
 }
 
+//Draw gauge charts
+//return update callback
 function drawGaugeCharts(){
 
     var options1 = {
